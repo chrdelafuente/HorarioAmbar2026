@@ -3,174 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horario 8° Ambar | Dashboard Pro</title>
+    <title>8° Ambar | Tech Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --bg-main: #fcfcfd;
-            --accent: #4f46e5;
+            --bg-base: #0f172a;
+            --panel-bg: #1e293b;
+            --accent-main: #6366f1;
+            --accent-cyan: #06b6d4;
         }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-main);
-            color: #1e293b;
+            background-color: var(--bg-base);
+            color: #f1f5f9;
             -webkit-font-smoothing: antialiased;
         }
-        .subject-card {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left-width: 5px;
-            position: relative;
-        }
-        @media (min-width: 768px) {
-            .subject-card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.1);
-                z-index: 50;
-            }
-        }
-        .cat-humanidades { border-left-color: #ef4444; background: linear-gradient(to right, #fef2f2, #ffffff); }
-        .cat-ciencias { border-left-color: #10b981; background: linear-gradient(to right, #ecfdf5, #ffffff); }
-        .cat-exactas { border-left-color: #3b82f6; background: linear-gradient(to right, #eff6ff, #ffffff); }
-        .cat-artes { border-left-color: #f59e0b; background: linear-gradient(to right, #fffbeb, #ffffff); }
-        .cat-deporte { border-left-color: #8b5cf6; background: linear-gradient(to right, #f5f3ff, #ffffff); }
-        .cat-tecnica { border-left-color: #64748b; background: linear-gradient(to right, #f8fafc, #ffffff); }
-        .cat-orientacion { border-left-color: #ec4899; background: linear-gradient(to right, #fdf2f8, #ffffff); }
+
+        /* Technical Category Colors */
+        .cat-humanidades { border-left: 5px solid #f43f5e; background: linear-gradient(135deg, rgba(244, 63, 94, 0.1) 0%, rgba(30, 41, 59, 0.4) 100%); }
+        .cat-ciencias { border-left: 5px solid #10b981; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(30, 41, 59, 0.4) 100%); }
+        .cat-exactas { border-left: 5px solid #6366f1; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(30, 41, 59, 0.4) 100%); }
+        .cat-artes { border-left: 5px solid #f59e0b; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(30, 41, 59, 0.4) 100%); }
+        .cat-deporte { border-left: 5px solid #06b6d4; background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(30, 41, 59, 0.4) 100%); }
+        .cat-tecnica { border-left: 5px solid #94a3b8; background: linear-gradient(135deg, rgba(148, 163, 184, 0.1) 0%, rgba(30, 41, 59, 0.4) 100%); }
+        .cat-orientacion { border-left: 5px solid #d946ef; background: linear-gradient(135deg, rgba(217, 70, 239, 0.1) 0%, rgba(30, 41, 59, 0.4) 100%); }
         
-        .active-block {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-            background: #ffffff !important;
+        .lunch-card { border-left: 5px solid #fb923c; background: rgba(251, 146, 60, 0.05); border-color: rgba(251, 146, 60, 0.3); }
+        .break-row { background: rgba(255, 255, 255, 0.02); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+
+        .active-cell {
+            outline: 2px solid var(--accent-main);
+            outline-offset: 1px;
+            background: rgba(99, 102, 241, 0.15) !important;
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
+            z-index: 20;
         }
 
-        .active-time-marker {
-            background-color: var(--accent);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 6px;
+        .merge-top { border-top: 0 !important; border-top-left-radius: 0 !important; border-top-right-radius: 0 !important; }
+        .merge-bottom { border-bottom: 0 !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
         }
 
-        .custom-tooltip {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-            width: 16rem;
-            backdrop-filter: blur(8px);
-        }
-
-        .tooltip-center { left: 50%; transform: translateX(-50%); }
-        .tooltip-right { right: 0; left: auto; transform: none; }
-        .tooltip-left { left: 0; transform: none; }
-        .tooltip-down { top: 115%; }
-        .tooltip-up { bottom: 115%; }
-
-        @media (min-width: 768px) {
-            .subject-card:hover .custom-tooltip { opacity: 1; }
-        }
-
-        .break-row-ui { 
-            background: repeating-linear-gradient(45deg, #fef9c3, #fef9c3 10px, #fefce8 10px, #fefce8 20px);
-            color: #854d0e; 
-            border: 1px solid #fef08a;
-        }
-        
-        .lunch-card-ui {
-            background: #fff7ed;
-            color: #c2410c;
-            border: 1px dashed #fdba74;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .merge-top { border-top-left-radius: 0 !important; border-top-right-radius: 0 !important; border-top: 0 !important; }
-        .merge-bottom { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; border-bottom: 0 !important; }
-        
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        @media print { .no-pdf { display: none !important; } }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
+
+        @media (max-width: 768px) {
+            .subject-card { min-height: 80px; }
+        }
+
+        @media print { 
+            .no-pdf { display: none !important; } 
+            body { background-color: white; color: black; }
+            #pdf-grid { border: 1px solid #ddd; background: white; }
+        }
     </style>
 </head>
 <body class="min-h-screen pb-12">
-    <div class="w-full px-4 py-6 md:px-10 md:py-10">
-        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6 bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-            <div class="flex items-center gap-5">
-                <div class="bg-indigo-600 p-3 rounded-2xl shadow-indigo-200 shadow-lg">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                </div>
-                <div>
-                    <div class="flex items-center gap-3">
-                        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">8° Ambar</h1>
-                        <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold tracking-widest">PERIODO 2026</span>
-                    </div>
-                    <p class="text-slate-400 text-sm font-medium mt-1 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        Fundación Educar para la Vida
-                    </p>
-                </div>
-            </div>
+    <div class="max-w-[1500px] mx-auto px-4 py-6 md:py-10">
+        
+        <!-- Command Header -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
             
-            <div class="flex items-center gap-4 w-full lg:w-auto">
-                <div id="status-container" class="flex-1 lg:flex-none flex items-center gap-4 bg-slate-50 px-5 py-3 rounded-2xl border border-slate-100 transition-all duration-500">
-                    <div class="relative flex items-center justify-center">
-                        <div id="status-dot" class="w-3 h-3 bg-slate-300 rounded-full"></div>
-                        <div id="status-ping" class="absolute w-full h-full bg-slate-300 rounded-full animate-ping opacity-75 hidden"></div>
+            <header class="lg:col-span-2 glass-panel p-6 rounded-3xl border border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
-                    <div class="flex flex-col">
-                        <p id="current-time" class="text-2xl font-black text-slate-900 tabular-nums tracking-tight leading-none">00:00</p>
-                        <p id="current-info" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Sincronizando</p>
+                    <div>
+                        <h1 class="text-3xl font-extrabold tracking-tighter text-white leading-none">8° Ambar</h1>
+                        <p id="header-date" class="text-indigo-300 text-[10px] font-black uppercase tracking-[0.25em] mt-2">---</p>
                     </div>
                 </div>
-                <button onclick="downloadPDF()" class="no-pdf bg-slate-900 hover:bg-black text-white p-4 rounded-2xl transition-all shadow-xl shadow-slate-200 group">
-                    <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <button onclick="downloadPDF()" class="no-pdf p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/10 group">
+                    <svg class="w-5 h-5 text-white/60 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2"></path></svg>
                 </button>
-            </div>
-        </header>
+            </header>
 
-        <nav class="md:hidden flex gap-2 mb-6 overflow-x-auto no-pdf pb-2 scroll-smooth hide-scrollbar">
-            <button onclick="switchDay(1)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-sm font-bold bg-white border border-slate-100 text-slate-500" data-day="1">Lun</button>
-            <button onclick="switchDay(2)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-sm font-bold bg-white border border-slate-100 text-slate-500" data-day="2">Mar</button>
-            <button onclick="switchDay(3)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-sm font-bold bg-white border border-slate-100 text-slate-500" data-day="3">Mié</button>
-            <button onclick="switchDay(4)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-sm font-bold bg-white border border-slate-100 text-slate-500" data-day="4">Jue</button>
-            <button onclick="switchDay(5)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-sm font-bold bg-white border border-slate-100 text-slate-500" data-day="5">Vie</button>
+            <div class="glass-panel p-6 rounded-3xl border border-white/5 flex items-center justify-between">
+                <div>
+                    <span class="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1 block">Status Operativo</span>
+                    <span id="current-time" class="text-3xl font-black tabular-nums text-white leading-none">00:00</span>
+                    <div class="flex items-center gap-2 mt-2">
+                        <div id="status-dot" class="w-2 h-2 bg-slate-500 rounded-full"></div>
+                        <span id="status-label" class="text-[9px] font-bold text-white/40 uppercase tracking-tight">Sincronizando...</span>
+                    </div>
+                </div>
+                <div class="relative w-14 h-14">
+                    <svg class="progress-ring" width="56" height="56">
+                        <circle class="text-white/5" stroke-width="4" stroke="currentColor" fill="transparent" r="24" cx="28" cy="28"/>
+                        <circle id="progress-circle" class="progress-ring__circle text-indigo-400" stroke-width="4" stroke-dasharray="150.8" stroke-dashoffset="150.8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="24" cx="28" cy="28"/>
+                    </svg>
+                    <div id="progress-text" class="absolute inset-0 flex items-center justify-center text-[9px] font-black text-indigo-300">0%</div>
+                </div>
+            </div>
+
+            <div id="next-class-panel" class="bg-indigo-600/90 p-6 rounded-3xl shadow-xl flex items-center justify-between text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="text-[9px] font-black text-white/50 uppercase tracking-widest mb-1 block">Próxima Actividad</span>
+                    <h2 id="next-subject-name" class="text-lg font-extrabold tracking-tight truncate w-32">---</h2>
+                    <p id="next-subject-time" class="text-[9px] font-bold text-white/60 uppercase mt-1">---</p>
+                </div>
+                <div id="next-subject-icon" class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center font-black text-sm z-10 border border-white/10">--</div>
+                <svg class="absolute -right-4 -bottom-4 w-24 h-24 text-white/5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2z"/></svg>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <nav class="md:hidden flex gap-1.5 mb-6 overflow-x-auto no-pdf pb-2 hide-scrollbar">
+            <button onclick="switchDay(1)" class="day-tab flex-1 min-w-[75px] px-3 py-3 rounded-2xl text-[10px] font-black bg-white/5 border border-white/5 text-white/30 uppercase tracking-tighter" data-day="1">Lun</button>
+            <button onclick="switchDay(2)" class="day-tab flex-1 min-w-[75px] px-3 py-3 rounded-2xl text-[10px] font-black bg-white/5 border border-white/5 text-white/30 uppercase tracking-tighter" data-day="2">Mar</button>
+            <button onclick="switchDay(3)" class="day-tab flex-1 min-w-[75px] px-3 py-3 rounded-2xl text-[10px] font-black bg-white/5 border border-white/5 text-white/30 uppercase tracking-tighter" data-day="3">Mié</button>
+            <button onclick="switchDay(4)" class="day-tab flex-1 min-w-[75px] px-3 py-3 rounded-2xl text-[10px] font-black bg-white/5 border border-white/5 text-white/30 uppercase tracking-tighter" data-day="4">Jue</button>
+            <button onclick="switchDay(5)" class="day-tab flex-1 min-w-[75px] px-3 py-3 rounded-2xl text-[10px] font-black bg-white/5 border border-white/5 text-white/30 uppercase tracking-tighter" data-day="5">Vie</button>
         </nav>
 
-        <div id="pdf-grid" class="bg-white p-3 md:p-8 rounded-[2.5rem] shadow-sm border border-slate-100 overflow-visible">
+        <!-- Main Timetable Content -->
+        <div id="pdf-grid" class="glass-panel p-2 md:p-6 rounded-[2.5rem] border border-white/5">
             <div class="min-w-full">
-                <div class="hidden md:grid grid-cols-12 gap-6 mb-6 font-extrabold text-[11px] uppercase tracking-[0.2em] text-slate-400 px-4">
-                    <div class="col-span-1 text-center">Hora</div>
-                    <div class="col-span-11 grid grid-cols-5 gap-6">
-                        <div class="text-center">Lunes</div>
-                        <div class="text-center">Martes</div>
-                        <div class="text-center">Miércoles</div>
-                        <div class="text-center">Jueves</div>
-                        <div class="text-center">Viernes</div>
+                <!-- Grid Labels -->
+                <div class="hidden md:grid grid-cols-12 gap-4 mb-6 px-4">
+                    <div class="col-span-1"></div>
+                    <div class="col-span-11 grid grid-cols-5 gap-4">
+                        <div class="text-center font-black text-[10px] text-white/20 uppercase tracking-[0.3em]">Lunes</div>
+                        <div class="text-center font-black text-[10px] text-white/20 uppercase tracking-[0.3em]">Martes</div>
+                        <div class="text-center font-black text-[10px] text-white/20 uppercase tracking-[0.3em]">Miércoles</div>
+                        <div class="text-center font-black text-[10px] text-white/20 uppercase tracking-[0.3em]">Jueves</div>
+                        <div class="text-center font-black text-[10px] text-white/20 uppercase tracking-[0.3em]">Viernes</div>
                     </div>
                 </div>
-                <div id="timetable-content" class="space-y-2"></div>
+                <!-- Rows Container -->
+                <div id="timetable-content" class="space-y-2 md:space-y-3"></div>
             </div>
         </div>
     </div>
 
+    <!-- Hidden element for status pings to avoid reference errors -->
+    <div id="status-ping" class="hidden"></div>
+
     <script>
-        const subjects = {
+        const subjectsData = {
             'LNG': { name: 'Lenguaje y Comunicación', teacher: 'Prof. Troncoso', cat: 'cat-humanidades' },
             'JEF': { name: 'Jefatura / Consejo de Curso', teacher: 'Prof. Troncoso', cat: 'cat-orientacion' },
             'MTM': { name: 'Educación Matemática', teacher: 'Prof. Rocha', cat: 'cat-exactas' },
             'ART': { name: 'Artes Visuales', teacher: 'Prof. Bruno', cat: 'cat-artes' },
             'DyS': { name: 'Deporte y Vida Saludable', teacher: 'Prof. Ñancul', cat: 'cat-deporte' },
             'HyG': { name: 'Hist. Geografía y Cs. Soc.', teacher: 'Prof. Higuera', cat: 'cat-humanidades' },
-            'CS NAT': { name: 'Ciencias Naturales', teacher: 'Sazo / Flores / Contreras', cat: 'cat-ciencias' },
+            'CS NAT': { name: 'Ciencias Naturales', teacher: 'Contreras/Sazo/Flores', cat: 'cat-ciencias' },
             'EFI': { name: 'Educación Física y Salud', teacher: 'Prof. Pérez', cat: 'cat-deporte' },
             'OC': { name: 'Orientación', teacher: 'Prof. Avendaño', cat: 'cat-orientacion' },
             'ING': { name: 'Idioma Extranjero: Inglés', teacher: 'Prof. Villarreal', cat: 'cat-humanidades' },
-            'Taller Pedagogo': { name: 'Refuerzo Pedagógico', teacher: 'V. Riquelme / J. Yañez', cat: 'cat-tecnica' },
+            'Taller Pedagogo': { name: 'Refuerzo Pedagógico', teacher: 'Especialistas', cat: 'cat-tecnica' },
             'TEC N': { name: 'Educación Tecnológica', teacher: 'Prof. Vargas', cat: 'cat-tecnica' },
             'MÚS': { name: 'Educación Musical', teacher: 'Prof. Reyes', cat: 'cat-artes' }
         };
@@ -178,10 +167,10 @@
         const schedule = [
             { type: 'period', id: 1, time: ["08:15", "09:00"], data: ["LNG", "HyG", "Taller Pedagogo", "LNG", "ING"] },
             { type: 'period', id: 2, time: ["09:00", "09:45"], data: ["LNG", "HyG", "MTM", "LNG", "ING"] },
-            { type: 'break', time: ["09:45", "10:00"], label: "Recreo Intermedio" },
+            { type: 'break', time: ["09:45", "10:00"], label: "Pausa Operativa" },
             { type: 'period', id: 3, time: ["10:00", "10:45"], data: ["JEF", "CS NAT", "ING", "MTM", "CS NAT"] },
             { type: 'period', id: 4, time: ["10:45", "11:30"], data: ["JEF", "CS NAT", "OC", "MTM", "CS NAT"] },
-            { type: 'break', time: ["11:30", "11:45"], label: "Recreo Intermedio" },
+            { type: 'break', time: ["11:30", "11:45"], label: "Pausa Operativa" },
             { type: 'period', id: 5, time: ["11:45", "12:30"], data: ["MTM", "EFI", "CS NAT", "Taller Pedagogo", "TEC N"] },
             { type: 'period', id: 6, time: ["12:30", "13:15"], data: ["ART", "EFI", "CS NAT", "ART", "MÚS"] },
             { type: 'period', id: 7, time: ["13:15", "14:00"], data: ["ALM", "ALM", "ALM", "ALM", "MÚS"] },
@@ -198,6 +187,7 @@
 
         function renderTimetable() {
             const container = document.getElementById('timetable-content');
+            if(!container) return;
             const isMobile = window.innerWidth < 768;
             const now = new Date();
             const currentDay = now.getDay();
@@ -206,76 +196,60 @@
             container.innerHTML = '';
 
             schedule.forEach((item, rowIndex) => {
-                const startTime = parseInt(item.time[0].replace(':', ''));
-                const endTime = parseInt(item.time[1].replace(':', ''));
-                const isCurrentTimeSlot = currentHHMM >= startTime && currentHHMM < endTime;
+                const startNum = parseInt(item.time[0].replace(':', ''));
+                const endNum = parseInt(item.time[1].replace(':', ''));
+                const isCurrentBlock = currentHHMM >= startNum && currentHHMM < endNum;
 
                 if (item.type === 'break') {
-                    const el = document.createElement('div');
-                    const isActiveBreak = isCurrentTimeSlot && (currentDay >= 1 && currentDay <= 5);
-                    el.className = `grid grid-cols-12 gap-2 md:gap-6 items-center h-10 break-row-ui rounded-2xl px-4 ${isActiveBreak ? 'active-break' : ''}`;
-                    el.innerHTML = `
-                        <div class="col-span-2 md:col-span-1 text-right text-[10px] font-black opacity-50 tabular-nums">${item.time[0]}</div>
-                        <div class="col-span-10 md:col-span-11 text-center text-[10px] font-black uppercase tracking-[0.3em]">${item.label}</div>
+                    const row = document.createElement('div');
+                    row.className = `grid grid-cols-12 gap-3 items-center h-8 break-row rounded-xl px-4 transition-all duration-500 ${isCurrentBlock && currentDay >= 1 && currentDay <= 5 ? 'bg-indigo-500/10 border-indigo-500/30' : ''}`;
+                    row.innerHTML = `
+                        <div class="col-span-2 md:col-span-1 text-right text-[8px] font-black text-white/20 tabular-nums">${item.time[0]}</div>
+                        <div class="col-span-10 md:col-span-11 text-center text-[9px] font-black uppercase tracking-[0.4em] text-white/30">${item.label}</div>
                     `;
-                    container.appendChild(el);
+                    container.appendChild(row);
                     return;
                 }
 
                 const row = document.createElement('div');
-                row.className = 'grid grid-cols-12 gap-2 md:gap-6 h-24 items-stretch';
+                row.className = 'grid grid-cols-12 gap-3 md:gap-4 h-24 items-stretch';
                 
                 const timeCol = document.createElement('div');
-                timeCol.className = 'col-span-2 md:col-span-1 flex flex-col justify-center text-right pr-4 border-r border-slate-100';
+                timeCol.className = `col-span-2 md:col-span-1 flex flex-col justify-center text-right pr-4 border-r border-white/5 ${isCurrentBlock ? 'text-indigo-400' : 'text-white/20'}`;
                 timeCol.innerHTML = `
-                    <span class="text-slate-300 font-bold text-[10px] mb-1">#${item.id}</span>
-                    <span class="text-slate-900 font-black text-sm md:text-base ${isCurrentTimeSlot ? 'active-time-marker' : ''}">${item.time[0]}</span>
-                    <span class="text-slate-400 font-bold text-[10px] mt-1">${item.time[1]}</span>
+                    <span class="font-black text-[8px] mb-1 opacity-50 uppercase">B-${item.id}</span>
+                    <span class="font-black text-xs md:text-sm tabular-nums leading-none">${item.time[0]}</span>
+                    <span class="font-bold text-[8px] opacity-40 mt-1">${item.time[1]}</span>
                 `;
                 row.appendChild(timeCol);
 
                 const grid = document.createElement('div');
-                grid.className = 'col-span-10 md:col-span-11 grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-6';
+                grid.className = 'col-span-10 md:col-span-11 grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4';
 
                 item.data.forEach((code, colIndex) => {
                     const isToday = (colIndex + 1) === currentDay;
-                    const isActiveSubject = isToday && isCurrentTimeSlot;
-
+                    const isActive = isToday && isCurrentBlock;
                     if (isMobile && (colIndex + 1) !== currentActiveDay) return;
 
                     const block = document.createElement('div');
+                    
                     if (code === "-") {
-                        block.className = 'bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-100 h-full';
+                        block.className = 'bg-white/[0.02] rounded-2xl border border-dashed border-white/5 h-full';
                     } else if (code === "ALM") {
-                        block.className = `lunch-card-ui rounded-3xl h-full shadow-sm ${isActiveSubject ? 'active-block' : ''}`;
-                        block.innerHTML = `
-                            <svg class="w-5 h-5 mr-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2L12 22M2 12L22 12M5 5L19 19M5 19L19 5" stroke-width="2"></path></svg>
-                            <span class="text-[10px] md:text-xs">Almuerzo</span>
-                        `;
+                        block.className = `lunch-card rounded-2xl flex flex-col items-center justify-center h-full border ${isActive ? 'active-cell' : ''}`;
+                        block.innerHTML = `<span class="text-[9px] font-black text-orange-400 uppercase tracking-widest">Almuerzo</span>`;
                     } else {
-                        const info = subjects[code];
+                        const info = subjectsData[code];
                         const prev = schedule[rowIndex - 1];
                         const next = schedule[rowIndex + 1];
-                        let merge = "";
-                        if (prev && prev.type === 'period' && prev.data[colIndex] === code) merge += " merge-top";
-                        if (next && next.type === 'period' && next.data[colIndex] === code) merge += " merge-bottom";
+                        let mergeClass = "";
+                        if (prev && prev.type === 'period' && prev.data[colIndex] === code) mergeClass += " merge-top";
+                        if (next && next.type === 'period' && next.data[colIndex] === code) mergeClass += " merge-bottom";
 
-                        const vPos = rowIndex < 8 ? 'tooltip-down' : 'tooltip-up';
-                        let hPos = 'tooltip-center';
-                        if (colIndex === 0) hPos = 'tooltip-left';
-                        if (colIndex === 4) hPos = 'tooltip-right';
-
-                        block.className = `subject-card ${info.cat} ${merge} p-4 rounded-3xl border border-slate-100/50 shadow-sm flex flex-col justify-center items-center text-center h-full ${isActiveSubject ? 'active-block' : ''}`;
+                        block.className = `subject-card ${info.cat} ${mergeClass} p-4 rounded-2xl border border-white/5 shadow-sm flex flex-col justify-center items-center text-center h-full transition-all duration-300 ${isActive ? 'active-cell' : ''}`;
                         block.innerHTML = `
-                            <div class="custom-tooltip ${vPos} ${hPos} bg-slate-900/95 text-white p-5 rounded-[1.5rem] border border-white/10 no-pdf">
-                                <p class="font-extrabold text-xs text-indigo-300 mb-2 uppercase tracking-widest">${info.name}</p>
-                                <div class="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-300 uppercase">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                    ${info.teacher}
-                                </div>
-                            </div>
-                            <span class="text-slate-900 font-extrabold text-sm md:text-base leading-none mb-1.5 tracking-tight">${code}</span>
-                            <span class="text-slate-500 font-bold text-[9px] md:text-[10px] uppercase truncate w-full opacity-60">${info.teacher.split(' ').pop()}</span>
+                            <span class="text-white font-black text-sm md:text-lg leading-none mb-1 tracking-tight">${code}</span>
+                            <span class="text-white/40 font-bold text-[9px] uppercase tracking-tighter truncate w-full">${info.teacher.split(' ').pop()}</span>
                         `;
                     }
                     grid.appendChild(block);
@@ -285,14 +259,25 @@
             });
         }
 
+        function setProgress(percent) {
+            const circle = document.getElementById('progress-circle');
+            if(!circle) return;
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            const offset = circumference - (percent / 100 * circumference);
+            circle.style.strokeDashoffset = offset;
+            const pText = document.getElementById('progress-text');
+            if(pText) pText.textContent = Math.round(percent) + '%';
+        }
+
         function switchDay(day) {
             currentActiveDay = day;
             document.querySelectorAll('.day-tab').forEach(t => {
-                t.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-100');
-                t.classList.add('bg-white', 'text-slate-500');
+                t.classList.remove('bg-indigo-500', 'text-white', 'border-indigo-500');
+                t.classList.add('bg-white/5', 'text-white/30');
                 if (parseInt(t.dataset.day) === day) {
-                    t.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-100');
-                    t.classList.remove('bg-white', 'text-slate-500');
+                    t.classList.add('bg-indigo-500', 'text-white', 'border-indigo-500');
+                    t.classList.remove('bg-white/5', 'text-white/30');
                 }
             });
             renderTimetable();
@@ -302,50 +287,79 @@
             const now = new Date();
             const day = now.getDay();
             const currentHHMM = now.getHours() * 100 + now.getMinutes();
-            const dailyClosing = { 1: 1540, 2: 1625, 3: 1540, 4: 1540, 5: 1445 };
             const isWeekDay = day >= 1 && day <= 5;
             
-            document.getElementById('current-time').textContent = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+            const daysArr = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+            const headerDate = document.getElementById('header-date');
+            if(headerDate) headerDate.textContent = `${daysArr[day]} ${now.getDate()} DE MARZO`;
             
-            const infoText = document.getElementById('current-info');
-            const dot = document.getElementById('status-dot');
-            const ping = document.getElementById('status-ping');
+            const timeDisplay = document.getElementById('current-time');
+            if(timeDisplay) timeDisplay.textContent = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-            let statusStr = "Fuera de Horario";
-            let dotColor = "bg-slate-300";
+            let statusStr = "Sistema Standby";
             let activeIdx = -1;
+            let progress = 0;
 
-            if (isWeekDay && currentHHMM >= 815 && currentHHMM <= (dailyClosing[day] || 0)) {
+            if (isWeekDay) {
                 const activeItem = schedule.find((s, idx) => {
                     const start = parseInt(s.time[0].replace(':', ''));
                     const end = parseInt(s.time[1].replace(':', ''));
                     if (currentHHMM >= start && currentHHMM < end) {
                         activeIdx = idx;
+                        
+                        const [sH, sM] = s.time[0].split(':').map(Number);
+                        const [eH, eM] = s.time[1].split(':').map(Number);
+                        const startTotal = sH * 60 + sM;
+                        const endTotal = eH * 60 + eM;
+                        const nowTotal = now.getHours() * 60 + now.getMinutes();
+                        progress = Math.max(0, Math.min(100, ((nowTotal - startTotal) / (endTotal - startTotal)) * 100));
+                        
                         return true;
                     }
                     return false;
                 });
 
                 if (activeItem) {
-                    if (activeItem.type === 'break') {
-                        statusStr = "En Recreo";
-                        dotColor = "bg-amber-500";
-                    } else if (activeItem.type === 'period' && activeItem.data[day-1] === "ALM") {
-                        statusStr = "Hora de Almuerzo";
-                        dotColor = "bg-orange-500";
-                    } else {
-                        statusStr = "Clase en Curso";
-                        dotColor = "bg-emerald-500";
+                    statusStr = activeItem.type === 'break' ? "En Recreo" : "Actividad Lectiva";
+                    const ping = document.getElementById('status-ping');
+                    if(ping) ping.classList.remove('hidden');
+                    
+                    let nextIdx = activeIdx + 1;
+                    while(nextIdx < schedule.length && schedule[nextIdx].type === 'break') nextIdx++;
+                    
+                    if(nextIdx < schedule.length) {
+                        const next = schedule[nextIdx];
+                        const nextCode = next.data[day-1];
+                        const nsName = document.getElementById('next-subject-name');
+                        const nsTime = document.getElementById('next-subject-time');
+                        const nsIcon = document.getElementById('next-subject-icon');
+
+                        if(nextCode && nextCode !== "-") {
+                            const info = subjectsData[nextCode] || { name: nextCode };
+                            if(nsName) nsName.textContent = info.name;
+                            if(nsTime) nsTime.textContent = `T-MINUS: ${next.time[0]}`;
+                            if(nsIcon) nsIcon.textContent = nextCode.substring(0,2);
+                        } else {
+                            if(nsName) nsName.textContent = "Finalización";
+                            if(nsTime) nsTime.textContent = "Fin de Jornada";
+                        }
                     }
+                } else {
+                    const ping = document.getElementById('status-ping');
+                    if(ping) ping.classList.add('hidden');
+                    progress = 0;
+                    const nsName = document.getElementById('next-subject-name');
+                    if(nsName) nsName.textContent = "Día Terminado";
                 }
-                ping.classList.remove('hidden');
-            } else {
-                ping.classList.add('hidden');
             }
 
-            infoText.textContent = statusStr;
-            dot.className = `w-3 h-3 ${dotColor} rounded-full transition-colors duration-500`;
-            ping.className = `absolute w-full h-full ${dotColor} rounded-full animate-ping opacity-75`;
+            const labelDisplay = document.getElementById('status-label');
+            if(labelDisplay) labelDisplay.textContent = statusStr;
+            
+            const dot = document.getElementById('status-dot');
+            if(dot) dot.style.backgroundColor = isWeekDay ? '#6366f1' : '#475569';
+            
+            setProgress(progress);
 
             if (activeIdx !== lastKnownActiveIndex) {
                 lastKnownActiveIndex = activeIdx;
@@ -364,29 +378,29 @@
                 schedule.forEach((item) => {
                     if (item.type === 'break') {
                         const el = document.createElement('div');
-                        el.className = `grid grid-cols-12 gap-1 items-center h-6 break-row-ui rounded mb-1`;
-                        el.innerHTML = `<div class="col-span-2 text-center text-[7px] font-black">${item.time[0]}</div><div class="col-span-10 text-center text-[7px] font-black uppercase">${item.label}</div>`;
+                        el.className = `grid grid-cols-12 h-6 border-y border-white/5 items-center bg-black/10 mb-1`;
+                        el.innerHTML = `<div class="col-span-1 text-[6px] text-center font-black">${item.time[0]}</div><div class="col-span-11 text-center text-[7px] font-black uppercase">${item.label}</div>`;
                         container.appendChild(el);
                         return;
                     }
                     const row = document.createElement('div');
-                    row.className = 'grid grid-cols-12 gap-1 h-14 items-stretch';
+                    row.className = 'grid grid-cols-12 gap-1 h-12 items-stretch';
                     const timeCol = document.createElement('div');
-                    timeCol.className = 'col-span-1 flex flex-col justify-center text-center border-r border-slate-100';
-                    timeCol.innerHTML = `<span class="text-[7px] font-black">${item.time[0]}</span>`;
+                    timeCol.className = 'col-span-1 flex flex-col justify-center text-center border-r border-white/5';
+                    timeCol.innerHTML = `<span class="text-[6px] font-black">${item.time[0]}</span>`;
                     row.appendChild(timeCol);
                     const grid = document.createElement('div');
                     grid.className = 'col-span-11 grid grid-cols-5 gap-1 h-full';
                     item.data.forEach((code) => {
                         const block = document.createElement('div');
-                        if (code === "-") block.className = 'bg-slate-50 border border-dashed border-slate-100';
+                        if (code === "-") block.className = 'bg-white/5 border border-dashed border-white/5';
                         else if (code === "ALM") {
-                            block.className = `lunch-card-ui bg-white rounded border border-slate-100 flex flex-col justify-center items-center text-center h-full`;
-                            block.innerHTML = `<span class="text-[6px] font-black">ALM</span>`;
+                            block.className = `bg-orange-500/10 border border-orange-500/20 rounded flex items-center justify-center h-full`;
+                            block.innerHTML = `<span class="text-[6px] font-black uppercase text-orange-400">ALM</span>`;
                         } else {
-                            const info = subjects[code];
-                            block.className = `subject-card ${info.cat} bg-white rounded border border-slate-100 flex flex-col justify-center items-center text-center h-full`;
-                            block.innerHTML = `<span class="text-slate-900 font-black text-[8px] leading-none">${code}</span>`;
+                            const info = subjectsData[code];
+                            block.className = `bg-white/5 rounded border border-white/5 flex items-center justify-center h-full`;
+                            block.innerHTML = `<span class="text-white font-black text-[8px] leading-none">${code}</span>`;
                         }
                         grid.appendChild(block);
                     });
@@ -397,9 +411,9 @@
 
             const opt = {
                 margin: 0.1,
-                filename: 'Horario_8A_Ambar_Elite.pdf',
+                filename: '8A_Command_Horario.pdf',
                 image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
+                html2canvas: { scale: 3, useCORS: true, backgroundColor: '#0f172a' },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
             };
 
@@ -412,7 +426,7 @@
         window.addEventListener('resize', renderTimetable);
         updateStatus();
         switchDay(currentActiveDay);
-        setInterval(updateStatus, 15000);
+        setInterval(updateStatus, 30000); // Update every 30 seconds
     </script>
 </body>
 </html>
