@@ -3,62 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>8° A Ámbar | Dashboard 2026</title>
+    <title>8° A Ámbar | Dashboard Operativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --bg-page: #f1f5f9;
-            --text-dark: #0f172a;
+            --bg-page: #f0f4f8;
+            --text-main: #1e293b;
+            --accent: #6366f1;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-page);
-            color: var(--text-dark);
+            color: var(--text-main);
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Esquema de colores Pastel (image_5f30aa.png) */
-        .cat-humanidades { background-color: #fee2e2; border-left: 4px solid #f87171; } /* Rojo/Rosa Pastel */
-        .cat-ciencias { background-color: #d1fae5; border-left: 4px solid #34d399; }   /* Verde Pastel */
-        .cat-exactas { background-color: #dbeafe; border-left: 4px solid #60a5fa; }    /* Azul Pastel */
-        .cat-artes { background-color: #fef3c7; border-left: 4px solid #fbbf24; }      /* Amarillo Pastel */
-        .cat-deporte { background-color: #ede9fe; border-left: 4px solid #a78bfa; }    /* Violeta Pastel */
-        .cat-tecnica { background-color: #f1f5f9; border-left: 4px solid #94a3b8; }    /* Gris Pastel */
-        .cat-orientacion { background-color: #fce7f3; border-left: 4px solid #f472b6; } /* Magenta Pastel */
-        
-        .lunch-card { background-color: #ffedd5; border: 1px dashed #fb923c; color: #9a3412; }
-        .break-row { background-color: #e2e8f0; color: #475569; font-weight: 800; }
+        /* Categorías Pastel */
+        .cat-humanidades { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+        .cat-exactas { background-color: #dbeafe; border-left: 4px solid #3b82f6; }
+        .cat-ciencias { background-color: #d1fae5; border-left: 4px solid #10b981; }
+        .cat-artes { background-color: #fef3c7; border-left: 4px solid #f59e0b; }
+        .cat-deporte { background-color: #f3e8ff; border-left: 4px solid #8b5cf6; }
+        .cat-tecnica { background-color: #f1f5f9; border-left: 4px solid #64748b; }
+        .cat-orientacion { background-color: #fae8ff; border-left: 4px solid #d946ef; }
 
-        .subject-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        .lunch-card { background-color: #fff7ed; border: 1px dashed #f97316; }
+        .break-row { background-color: #e2e8f0; color: #475569; }
+
+        .subject-pill {
+            border-radius: 2rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
         }
 
-        /* Resaltado de Bloque Activo */
+        /* Resaltado con Etiqueta ACTUAL */
         .active-cell {
-            outline: 3px solid #0f172a;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            transform: scale(1.02);
-            z-index: 20;
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2);
+            z-index: 30;
+            background-color: white !important;
         }
 
-        .active-cell::before {
-            content: "ACTUAL";
+        .active-label {
             position: absolute;
-            top: -10px;
-            right: 10px;
-            background: #0f172a;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0f172a;
             color: white;
             font-size: 8px;
-            padding: 2px 6px;
-            border-radius: 4px;
             font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+            pointer-events: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        /* Tooltip Minimalista */
+        .dash-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .dash-card-dark {
+            background: #0f172a;
+            color: white;
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
         .custom-tooltip {
             position: absolute;
             bottom: 110%;
@@ -66,116 +89,131 @@
             transform: translateX(-50%) translateY(5px);
             background: #0f172a;
             color: white;
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 0.75rem;
             font-size: 10px;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.15s ease;
-            z-index: 50;
+            transition: all 0.2s ease;
+            z-index: 100;
         }
 
-        .subject-card:hover .custom-tooltip {
+        .subject-pill:hover .custom-tooltip {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
 
-        .merge-top { border-top: 0 !important; border-top-left-radius: 0 !important; border-top-right-radius: 0 !important; }
-        .merge-bottom { border-bottom: 0 !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
-
-        @media (max-width: 768px) {
-            .subject-card { min-height: 80px; }
-        }
-
-        @media print { 
-            .no-pdf { display: none !important; }
-            body { background-color: white; }
-            #pdf-grid { border: 1px solid #ccc; border-radius: 0; }
-        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        @media print { .no-pdf { display: none !important; } }
     </style>
 </head>
-<body class="min-h-screen">
-    <div class="max-w-[1400px] mx-auto px-4 py-8">
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-[1400px] mx-auto">
         
-        <!-- Header -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6">
-            <div class="lg:col-span-6 bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-black tracking-tighter text-slate-900 leading-none">8° A Ámbar</h1>
-                    <p id="header-date" class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-2">Cargando...</p>
+        <!-- Barra de Leyenda -->
+        <div class="bg-white rounded-full px-6 py-3 mb-6 flex flex-wrap items-center justify-between shadow-sm border border-slate-100 no-pdf">
+            <div class="flex items-center gap-4">
+                <span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest">8A-AMBAR-2026</span>
+                <span class="text-slate-300 text-[10px] font-bold uppercase tracking-wider">Dashboard Técnico</span>
+            </div>
+            <div class="flex gap-4 items-center overflow-x-auto hide-scrollbar">
+                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
+                    <div class="w-2 h-2 rounded-full bg-red-500"></div> Humanidades
                 </div>
-                <button onclick="downloadPDF()" class="no-pdf bg-slate-900 text-white p-3 rounded-2xl hover:bg-black transition-all">
+                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
+                    <div class="w-2 h-2 rounded-full bg-blue-500"></div> Exactas
+                </div>
+                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div> Ciencias
+                </div>
+                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
+                    <div class="w-2 h-2 rounded-full bg-orange-500"></div> Artes
+                </div>
+                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
+                    <div class="w-2 h-2 rounded-full bg-purple-500"></div> Deporte
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjetas de Estado -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="dash-card p-6 flex items-center justify-between relative overflow-hidden group">
+                <div class="flex items-center gap-5 z-10">
+                    <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black tracking-tighter">8° Ambar</h2>
+                        <p id="header-date" class="text-indigo-600 text-[10px] font-black uppercase tracking-widest mt-1">Cargando...</p>
+                    </div>
+                </div>
+                <button onclick="downloadPDF()" class="no-pdf w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center hover:bg-black transition-colors z-10">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5"></path></svg>
                 </button>
             </div>
 
-            <div class="lg:col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-center">
-                <span class="text-[9px] font-black text-slate-400 uppercase mb-1">Tiempo Restante</span>
-                <div class="flex items-end gap-2">
-                    <span id="time-left" class="text-3xl font-black tabular-nums leading-none">--:--</span>
-                    <span id="status-label" class="text-[9px] font-bold text-slate-300 uppercase pb-1">Standby</span>
+            <div class="dash-card p-6 flex items-center justify-between">
+                <div>
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cierre de Bloque</span>
+                    <span id="time-left" class="text-4xl font-black tabular-nums tracking-tighter">--:--</span>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span id="current-time-label" class="text-xs font-bold text-indigo-600 tabular-nums">00:00</span>
+                        <span id="status-label" class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Sincronizando</span>
+                    </div>
+                </div>
+                <div class="relative w-16 h-16">
+                    <svg class="progress-ring" width="64" height="64">
+                        <circle class="text-slate-100" stroke-width="6" stroke="currentColor" fill="transparent" r="28" cx="32" cy="32"/>
+                        <circle id="progress-circle" class="progress-ring__circle text-indigo-500" stroke-width="6" stroke-dasharray="175.9" stroke-dashoffset="175.9" stroke-linecap="round" stroke="currentColor" fill="transparent" r="28" cx="32" cy="32"/>
+                    </svg>
+                    <div id="progress-text" class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-indigo-600">0%</div>
                 </div>
             </div>
 
-            <div id="next-class-panel" class="lg:col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center justify-between overflow-hidden relative">
-                <div class="z-10">
-                    <span class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Próxima Clase</span>
-                    <h2 id="next-subject-name" class="text-lg font-black tracking-tight truncate w-32 uppercase">---</h2>
+            <div class="dash-card dash-card-dark p-6 flex items-center justify-between">
+                <div>
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Próximo Módulo</span>
+                    <h2 id="next-subject-name" class="text-2xl font-black tracking-tight truncate w-32 uppercase leading-none">---</h2>
+                    <p id="next-subject-time" class="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">---</p>
                 </div>
-                <div id="next-subject-icon" class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center font-black text-xs">--</div>
+                <div id="next-subject-icon" class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center font-black border border-white/10 uppercase text-xs">--</div>
             </div>
         </div>
 
-        <!-- Búsqueda -->
-        <div class="relative mb-6 no-pdf">
-            <input type="text" id="search-input" placeholder="Filtrar por ramo o docente..." class="w-full bg-white border border-slate-200 p-4 pl-12 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-slate-900 outline-none transition-all">
-            <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="3"></path></svg>
-        </div>
-
-        <!-- Navegación Móvil -->
-        <nav class="md:hidden flex gap-2 mb-4 overflow-x-auto no-pdf pb-2">
-            <button onclick="switchDay(1)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-[10px] font-black bg-white text-slate-400 border border-slate-200 uppercase" data-day="1">Lun</button>
-            <button onclick="switchDay(2)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-[10px] font-black bg-white text-slate-400 border border-slate-200 uppercase" data-day="2">Mar</button>
-            <button onclick="switchDay(3)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-[10px] font-black bg-white text-slate-400 border border-slate-200 uppercase" data-day="3">Mié</button>
-            <button onclick="switchDay(4)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-[10px] font-black bg-white text-slate-400 border border-slate-200 uppercase" data-day="4">Jue</button>
-            <button onclick="switchDay(5)" class="day-tab flex-1 min-w-[80px] px-4 py-3 rounded-2xl text-[10px] font-black bg-white text-slate-400 border border-slate-200 uppercase" data-day="5">Vie</button>
-        </nav>
-
-        <!-- Grilla Principal -->
-        <div id="pdf-grid" class="bg-white p-4 md:p-8 rounded-[2.5rem] shadow-sm border border-slate-200 overflow-visible">
+        <!-- Grilla de Horario -->
+        <div id="pdf-grid" class="bg-white rounded-[2.5rem] p-4 md:p-8 shadow-sm border border-slate-200">
             <div class="hidden md:grid grid-cols-12 gap-4 mb-6 px-4">
                 <div class="col-span-1"></div>
                 <div class="col-span-11 grid grid-cols-5 gap-4">
-                    <div class="text-center font-black text-[10px] text-slate-300 uppercase tracking-widest">Lunes</div>
-                    <div class="text-center font-black text-[10px] text-slate-300 uppercase tracking-widest">Martes</div>
-                    <div class="text-center font-black text-[10px] text-slate-300 uppercase tracking-widest">Miércoles</div>
-                    <div class="text-center font-black text-[10px] text-slate-300 uppercase tracking-widest">Jueves</div>
-                    <div class="text-center font-black text-[10px] text-slate-300 uppercase tracking-widest">Viernes</div>
+                    <div class="text-center text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">Lunes</div>
+                    <div class="text-center text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">Martes</div>
+                    <div class="text-center text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">Miércoles</div>
+                    <div class="text-center text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">Jueves</div>
+                    <div class="text-center text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">Viernes</div>
                 </div>
             </div>
-            <div id="timetable-content" class="space-y-3"></div>
+            <div id="timetable-content" class="space-y-4"></div>
         </div>
     </div>
 
     <script>
         const subjectsData = {
-            'LNG': { name: 'Lenguaje y Comunicación', teacher: 'P. Troncoso', cat: 'cat-humanidades' },
-            'JEF': { name: 'Jefatura / Consejo de Curso', teacher: 'P. Troncoso', cat: 'cat-orientacion' },
-            'MTM': { name: 'Educación Matemática', teacher: 'J. Rocha', cat: 'cat-exactas' },
-            'ART': { name: 'Artes Visuales', teacher: 'O. Bruno', cat: 'cat-artes' },
-            'DyS': { name: 'Deporte y Vida Saludable', teacher: 'J. Ñancul', cat: 'cat-deporte' },
-            'HyG': { name: 'Hist. Geografía y Cs. Soc.', teacher: 'R. Higuera', cat: 'cat-humanidades' },
-            'CSN': { name: 'Ciencias Naturales', teacher: 'F. Sazo/M. Flores/C. Contreras', cat: 'cat-ciencias' },
-            'EFI': { name: 'Educación Física y Salud', teacher: 'S. Pérez', cat: 'cat-deporte' },
-            'OC': { name: 'Orientación', teacher: 'B. Avendaño', cat: 'cat-orientacion' },
-            'ING': { name: 'Idioma Extranjero: Inglés', teacher: 'R. Villarreal', cat: 'cat-humanidades' },
-            'TAL': { name: 'Taller Pedagógico', teacher: 'V. Riquelme / J. Yañez', cat: 'cat-tecnica' },
-            'TEC': { name: 'Educación Tecnológica', teacher: 'L. Vargas', cat: 'cat-tecnica' },
-            'MUS': { name: 'Educación Musical', teacher: 'D. Reyes', cat: 'cat-artes' }
+            'LNG': { name: 'Lenguaje y Comunicación', teacher: 'Troncoso', cat: 'cat-humanidades' },
+            'JEF': { name: 'Jefatura / Consejo de Curso', teacher: 'Troncoso', cat: 'cat-orientacion' },
+            'MTM': { name: 'Educación Matemática', teacher: 'Rocha', cat: 'cat-exactas' },
+            'ART': { name: 'Artes Visuales', teacher: 'Bruno', cat: 'cat-artes' },
+            'DyS': { name: 'Deporte y Vida Saludable', teacher: 'Ñancul', cat: 'cat-deporte' },
+            'HyG': { name: 'Hist. Geografía y Cs. Soc.', teacher: 'Higuera', cat: 'cat-humanidades' },
+            'CSN': { name: 'Ciencias Naturales', teacher: 'Sazo/Flores/Contreras', cat: 'cat-ciencias' },
+            'EFI': { name: 'Educación Física y Salud', teacher: 'Pérez', cat: 'cat-deporte' },
+            'OC': { name: 'Orientación', teacher: 'Avendaño', cat: 'cat-orientacion' },
+            'ING': { name: 'Idioma Extranjero: Inglés', teacher: 'Villarreal', cat: 'cat-humanidades' },
+            'TAL': { name: 'Taller Pedagógico', teacher: 'Riquelme/Yañez', cat: 'cat-tecnica' },
+            'TEC': { name: 'Educación Tecnológica', teacher: 'Vargas', cat: 'cat-tecnica' },
+            'MUS': { name: 'Educación Musical', teacher: 'Reyes', cat: 'cat-artes' }
         };
 
-        // Distribución horaria verificada según WhatsApp Image
         const schedule = [
             { type: 'period', id: 1, time: ["08:15", "09:00"], data: ["LNG", "HyG", "TAL", "LNG", "ING"] },
             { type: 'period', id: 2, time: ["09:00", "09:45"], data: ["LNG", "HyG", "MTM", "LNG", "ING"] },
@@ -186,86 +224,81 @@
             { type: 'period', id: 5, time: ["11:45", "12:30"], data: ["MTM", "EFI", "CSN", "TAL", "TEC"] },
             { type: 'period', id: 6, time: ["12:30", "13:15"], data: ["ART", "EFI", "CSN", "ART", "MUS"] },
             { type: 'period', id: 7, time: ["13:15", "14:00"], data: ["ALM", "ALM", "ALM", "ALM", "MUS"] },
-            { type: 'period', id: 8, time: ["14:00", "14:45"], data: ["DyS", "LNG", "MTM", "HyG", "-"] },
-            { type: 'period', id: 9, time: ["14:55", "15:40"], data: ["DyS", "LNG", "MTM", "HyG", "-"] },
-            { type: 'period', id: 10, time: ["15:40", "16:25"], data: ["-", "OC", "-", "-", "-"] }
+            { type: 'period', id: 8, time: ["14:00", "14:45"], data: ["DyS", "LNG", "MTM", "HyG", "MUS"] },
+            { type: 'period', id: 9, time: ["14:45", "15:30"], data: ["DyS", "LNG", "MTM", "HyG", "-"] },
+            { type: 'period', id: 10, time: ["15:30", "16:15"], data: ["-", "OC", "-", "-", "-"] }
         ];
 
-        let currentDayTab = new Date().getDay() || 1;
-        if (currentDayTab > 5) currentDayTab = 1;
-        let lastKnownActiveIdx = -1;
-        let searchQuery = "";
+        let lastActiveIdx = -1;
 
-        function renderTimetable() {
+        function render() {
             const container = document.getElementById('timetable-content');
-            if (!container) return;
-            const isMobile = window.innerWidth < 768;
+            if(!container) return;
             const now = new Date();
-            const currentDay = now.getDay();
-            const currentHHMM = now.getHours() * 100 + now.getMinutes();
+            const curDay = now.getDay();
+            const hhmm = now.getHours() * 100 + now.getMinutes();
 
             container.innerHTML = '';
 
-            schedule.forEach((item, rowIndex) => {
+            schedule.forEach((item) => {
                 const sNum = parseInt(item.time[0].replace(':', ''));
                 const eNum = parseInt(item.time[1].replace(':', ''));
-                const isCurrentTime = currentHHMM >= sNum && currentHHMM < eNum;
+                const isCurrent = hhmm >= sNum && hhmm < eNum;
 
                 if (item.type === 'break') {
-                    const row = document.createElement('div');
-                    row.className = `grid grid-cols-12 gap-3 items-center h-8 break-row rounded-xl px-4 transition-all ${isCurrentTime && currentDay >= 1 && currentDay <= 5 ? 'bg-slate-300' : ''}`;
-                    row.innerHTML = `
-                        <div class="col-span-2 md:col-span-1 text-right text-[8px] font-black opacity-30">${item.time[0]}</div>
-                        <div class="col-span-10 md:col-span-11 text-center text-[9px] font-black uppercase tracking-[0.6em]">${item.label}</div>
+                    const el = document.createElement('div');
+                    const isDayActive = isCurrent && curDay >= 1 && curDay <= 5;
+                    el.className = `grid grid-cols-12 items-center h-10 bg-slate-50 border-y border-slate-100 rounded-2xl px-4 transition-all ${isDayActive ? 'ring-2 ring-indigo-200 bg-indigo-50' : ''}`;
+                    el.innerHTML = `
+                        <div class="col-span-1 text-[8px] font-black text-slate-300 tabular-nums">${item.time[0]}</div>
+                        <div class="col-span-11 text-center text-[10px] font-black uppercase tracking-[0.5em] text-slate-400">${item.label}</div>
                     `;
-                    container.appendChild(row);
+                    container.appendChild(el);
                     return;
                 }
 
                 const row = document.createElement('div');
-                row.className = 'grid grid-cols-12 gap-3 md:gap-5 h-24 items-stretch';
-                
+                row.className = 'grid grid-cols-12 gap-4 h-24 items-stretch';
+
                 const timeCol = document.createElement('div');
-                timeCol.className = `col-span-2 md:col-span-1 flex flex-col justify-center text-right pr-4 border-r border-slate-100 ${isCurrentTime ? 'text-slate-900 font-bold' : 'text-slate-200'}`;
+                timeCol.className = 'col-span-1 flex flex-col justify-center text-right pr-4 border-r border-slate-100';
                 timeCol.innerHTML = `
-                    <span class="text-[8px] font-black mb-1 opacity-50">B-${item.id}</span>
-                    <span class="text-xs md:text-sm font-black tabular-nums">${item.time[0]}</span>
-                    <span class="text-[9px] font-bold opacity-30 mt-1">${item.time[1]}</span>
+                    <span class="text-[8px] font-black text-slate-300 mb-1 uppercase tracking-tighter">B-${item.id}</span>
+                    <span class="text-base font-black text-slate-900 leading-none tabular-nums ${isCurrent ? 'text-indigo-600' : ''}">${item.time[0]}</span>
+                    <span class="text-[9px] font-bold text-slate-200 mt-1">${item.time[1]}</span>
                 `;
                 row.appendChild(timeCol);
 
                 const grid = document.createElement('div');
-                grid.className = 'col-span-10 md:col-span-11 grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-5';
+                grid.className = 'col-span-11 grid grid-cols-5 gap-4';
 
-                item.data.forEach((code, colIndex) => {
-                    const isToday = (colIndex + 1) === currentDay;
-                    const isActiveBlock = isToday && isCurrentTime;
-                    if (isMobile && (colIndex + 1) !== currentDayTab) return;
-
+                item.data.forEach((code, cIdx) => {
+                    const isToday = (cIdx + 1) === curDay;
+                    const isActive = isToday && isCurrent;
                     const block = document.createElement('div');
-                    
+
                     if (code === "-") {
-                        block.className = 'bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 h-full';
+                        block.className = 'bg-slate-50/50 rounded-[2rem] border-2 border-dashed border-slate-100 h-full';
                     } else if (code === "ALM") {
-                        block.className = `lunch-card rounded-2xl flex flex-col items-center justify-center h-full ${isActiveBlock ? 'active-cell' : ''}`;
+                        block.className = `subject-pill lunch-card flex flex-col items-center justify-center h-full ${isActive ? 'active-cell' : ''}`;
                         block.innerHTML = `<span class="text-[10px] font-black uppercase tracking-widest">Almuerzo</span>`;
                     } else {
                         const info = subjectsData[code];
-                        const prev = schedule[rowIndex - 1];
-                        const next = schedule[rowIndex + 1];
-                        let mTop = (prev && prev.type === 'period' && prev.data[colIndex] === code) ? " merge-top" : "";
-                        let mBottom = (next && next.type === 'period' && next.data[colIndex] === code) ? " merge-bottom" : "";
-
-                        const matchesSearch = searchQuery && (code.toLowerCase().includes(searchQuery) || info.name.toLowerCase().includes(searchQuery));
-                        const searchClass = searchQuery ? (matchesSearch ? "ring-2 ring-black scale-[1.02]" : "opacity-20 grayscale") : "";
-
-                        block.className = `subject-card ${info.cat}${mTop}${mBottom} ${searchClass} p-4 rounded-3xl flex flex-col justify-center items-center text-center h-full ${isActiveBlock ? 'active-cell' : ''}`;
+                        block.className = `subject-pill ${info.cat} p-4 flex flex-col justify-center items-center text-center h-full ${isActive ? 'active-cell' : ''}`;
                         block.innerHTML = `
                             <div class="custom-tooltip">${info.name}</div>
-                            <span class="text-slate-900 font-black text-sm md:text-2xl leading-none mb-1 tracking-tighter">${code}</span>
-                            <span class="text-slate-500 font-black text-[10px] uppercase truncate w-full">${info.teacher.split(' ').pop()}</span>
+                            <span class="text-slate-900 font-black text-2xl leading-none tracking-tighter">${code}</span>
+                            <span class="text-slate-500 font-bold text-[10px] uppercase truncate w-full mt-1 opacity-60">${info.teacher}</span>
                         `;
                     }
+                    
+                    if (isActive) {
+                        const label = document.createElement('span');
+                        label.className = 'active-label';
+                        label.textContent = 'ACTUAL';
+                        block.appendChild(label);
+                    }
+
                     grid.appendChild(block);
                 });
                 row.appendChild(grid);
@@ -273,95 +306,79 @@
             });
         }
 
-        function switchDay(day) {
-            currentDayTab = day;
-            document.querySelectorAll('.day-tab').forEach(t => {
-                t.classList.remove('bg-slate-900', 'text-white', 'border-slate-900');
-                t.classList.add('bg-white', 'text-slate-400', 'border-slate-200');
-                if (parseInt(t.dataset.day) === day) {
-                    t.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
-                    t.classList.remove('bg-white', 'text-slate-400', 'border-slate-200');
-                }
-            });
-            renderTimetable();
+        function setProgress(percent) {
+            const circle = document.getElementById('progress-circle');
+            if(!circle) return;
+            const r = circle.r.baseVal.value;
+            const circ = r * 2 * Math.PI;
+            circle.style.strokeDashoffset = circ - (percent / 100 * circ);
+            document.getElementById('progress-text').textContent = Math.round(percent) + '%';
         }
 
-        function updateStatus() {
+        function update() {
             const now = new Date();
             const day = now.getDay();
-            const currentHHMM = now.getHours() * 100 + now.getMinutes();
-            const isWeekDay = day >= 1 && day <= 5;
+            const hhmm = now.getHours() * 100 + now.getMinutes();
+            const daysArr = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
             
-            const daysArr = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
-            const hDate = document.getElementById('header-date');
-            if (hDate) hDate.textContent = `${daysArr[day]}, ${now.getDate()} DE ABRIL`;
-            
-            const tDisplay = document.getElementById('current-time');
-            // Nota: Este elemento ya no está en el nuevo diseño simplificado de header, se mantiene la lógica si existiera
-            
-            let sLabel = "Standby";
-            let activeIdx = -1;
-            let tLeft = "--:--";
+            document.getElementById('header-date').textContent = `${daysArr[day]}, ${now.getDate()} de Abril`;
+            document.getElementById('current-time-label').textContent = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-            if (isWeekDay) {
-                const activeItem = schedule.find((s, idx) => {
+            let activeIdx = -1;
+            let progress = 0;
+            let tLeftStr = "--:--";
+            let sLabel = "Standby";
+
+            if (day >= 1 && day <= 5) {
+                const curBlock = schedule.find((s, idx) => {
                     const start = parseInt(s.time[0].replace(':', ''));
                     const end = parseInt(s.time[1].replace(':', ''));
-                    if (currentHHMM >= start && currentHHMM < end) {
+                    if (hhmm >= start && hhmm < end) {
                         activeIdx = idx;
+                        const [sH, sM] = s.time[0].split(':').map(Number);
                         const [eH, eM] = s.time[1].split(':').map(Number);
-                        const endTot = eH * 60 + eM;
-                        const nowTot = now.getHours() * 60 + now.getMinutes();
-                        const diffS = (endTot - nowTot) * 60 - now.getSeconds();
-                        tLeft = `${Math.floor(diffS / 60)}:${(diffS % 60).toString().padStart(2, '0')}`;
+                        const sT = sH * 60 + sM;
+                        const eT = eH * 60 + eM;
+                        const nT = now.getHours() * 60 + now.getMinutes();
+                        progress = Math.max(0, Math.min(100, ((nT - sT) / (eT - sT)) * 100));
+                        const remS = (eT - nT) * 60 - now.getSeconds();
+                        tLeftStr = `${Math.floor(remS / 60)}:${(remS % 60).toString().padStart(2, '0')}`;
                         return true;
                     }
                     return false;
                 });
 
-                if (activeItem) {
-                    sLabel = activeItem.type === 'break' ? "Recreo" : "En Clase";
+                if (curBlock) {
+                    sLabel = curBlock.type === 'break' ? "Recreo" : "Módulo";
                     let nIdx = activeIdx + 1;
                     while(nIdx < schedule.length && schedule[nIdx].type === 'break') nIdx++;
                     if(nIdx < schedule.length) {
                         const next = schedule[nIdx];
                         const code = next.data[day-1];
-                        const nsN = document.getElementById('next-subject-name');
-                        const nsI = document.getElementById('next-subject-icon');
                         if(code && code !== "-") {
-                            if(nsN) nsN.textContent = subjectsData[code]?.name || code;
-                            if(nsI) nsI.textContent = code.substring(0,2);
-                        } else {
-                            if(nsN) nsN.textContent = "Fin Jornada";
+                            document.getElementById('next-subject-name').textContent = code;
+                            document.getElementById('next-subject-time').textContent = `A las ${next.time[0]}`;
+                            document.getElementById('next-subject-icon').textContent = code.substring(0,2);
                         }
                     }
-                } else {
-                    const nsN = document.getElementById('next-subject-name');
-                    if(nsN) nsN.textContent = "Cerrado";
                 }
             }
 
-            const sl = document.getElementById('status-label');
-            if(sl) sl.textContent = sLabel;
-            const tl = document.getElementById('time-left');
-            if(tl) tl.textContent = tLeft;
+            document.getElementById('time-left').textContent = tLeftStr;
+            document.getElementById('status-label').textContent = sLabel;
+            setProgress(progress);
 
-            if (activeIdx !== lastKnownActiveIdx) {
-                lastKnownActiveIdx = activeIdx;
-                renderTimetable();
+            if (activeIdx !== lastActiveIdx) {
+                lastActiveIdx = activeIdx;
+                render();
             }
         }
-
-        document.getElementById('search-input')?.addEventListener('input', (e) => {
-            searchQuery = e.target.value.toLowerCase();
-            renderTimetable();
-        });
 
         function downloadPDF() {
             const element = document.getElementById('pdf-grid');
             const opt = {
                 margin: 0.1,
-                filename: 'Horario_8A_Ambar_Pastel.pdf',
+                filename: 'Dashboard_Horario_8A.pdf',
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
@@ -369,10 +386,10 @@
             html2pdf().set(opt).from(element).save();
         }
 
-        window.addEventListener('resize', renderTimetable);
-        updateStatus();
-        switchDay(currentDayTab);
-        setInterval(updateStatus, 1000);
+        render();
+        update();
+        setInterval(update, 1000);
+        window.addEventListener('resize', render);
     </script>
 </body>
 </html>
