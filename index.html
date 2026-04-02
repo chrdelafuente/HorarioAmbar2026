@@ -64,6 +64,18 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
+        /* Búsqueda */
+        .highlight-search {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px #0f172a !important;
+            z-index: 40;
+        }
+
+        .dim-search {
+            opacity: 0.2;
+            filter: grayscale(1);
+        }
+
         .dash-card {
             background: white;
             border-radius: 1.5rem;
@@ -111,31 +123,6 @@
 <body class="min-h-screen p-4 md:p-8">
     <div class="max-w-[1400px] mx-auto">
         
-        <!-- Barra de Leyenda -->
-        <div class="bg-white rounded-full px-6 py-3 mb-6 flex flex-wrap items-center justify-between shadow-sm border border-slate-100 no-pdf">
-            <div class="flex items-center gap-4">
-                <span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest">8A-AMBAR-2026</span>
-                <span class="text-slate-300 text-[10px] font-bold uppercase tracking-wider">Dashboard Técnico</span>
-            </div>
-            <div class="flex gap-4 items-center overflow-x-auto hide-scrollbar">
-                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
-                    <div class="w-2 h-2 rounded-full bg-red-500"></div> Humanidades
-                </div>
-                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
-                    <div class="w-2 h-2 rounded-full bg-blue-500"></div> Exactas
-                </div>
-                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div> Ciencias
-                </div>
-                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
-                    <div class="w-2 h-2 rounded-full bg-orange-500"></div> Artes
-                </div>
-                <div class="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase">
-                    <div class="w-2 h-2 rounded-full bg-purple-500"></div> Deporte
-                </div>
-            </div>
-        </div>
-
         <!-- Tarjetas de Estado -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="dash-card p-6 flex items-center justify-between relative overflow-hidden group">
@@ -144,7 +131,7 @@
                         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-black tracking-tighter">8° Ambar</h2>
+                        <h2 class="text-2xl font-black tracking-tighter text-slate-900">8° Ambar</h2>
                         <p id="header-date" class="text-indigo-600 text-[10px] font-black uppercase tracking-widest mt-1">Cargando...</p>
                     </div>
                 </div>
@@ -156,7 +143,7 @@
             <div class="dash-card p-6 flex items-center justify-between">
                 <div>
                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cierre de Bloque</span>
-                    <span id="time-left" class="text-4xl font-black tabular-nums tracking-tighter">--:--</span>
+                    <span id="time-left" class="text-4xl font-black tabular-nums tracking-tighter text-slate-900">--:--</span>
                     <div class="flex items-center gap-2 mt-2">
                         <span id="current-time-label" class="text-xs font-bold text-indigo-600 tabular-nums">00:00</span>
                         <span id="status-label" class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Sincronizando</span>
@@ -179,6 +166,12 @@
                 </div>
                 <div id="next-subject-icon" class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center font-black border border-white/10 uppercase text-xs">--</div>
             </div>
+        </div>
+
+        <!-- Barra de Búsqueda -->
+        <div class="relative mb-8 no-pdf">
+            <input type="text" id="search-input" placeholder="Filtrar por asignatura o docente..." class="w-full bg-white border border-slate-200 p-4 pl-12 rounded-2xl text-sm font-bold text-slate-900 shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+            <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="3"></path></svg>
         </div>
 
         <!-- Grilla de Horario -->
@@ -230,6 +223,7 @@
         ];
 
         let lastActiveIdx = -1;
+        let searchQuery = "";
 
         function render() {
             const container = document.getElementById('timetable-content');
@@ -284,7 +278,12 @@
                         block.innerHTML = `<span class="text-[10px] font-black uppercase tracking-widest">Almuerzo</span>`;
                     } else {
                         const info = subjectsData[code];
-                        block.className = `subject-pill ${info.cat} p-4 flex flex-col justify-center items-center text-center h-full ${isActive ? 'active-cell' : ''}`;
+                        
+                        // Lógica de búsqueda
+                        const matchesSearch = searchQuery !== "" && (code.toLowerCase().includes(searchQuery) || info.name.toLowerCase().includes(searchQuery));
+                        const searchClass = searchQuery !== "" ? (matchesSearch ? "highlight-search" : "dim-search") : "";
+
+                        block.className = `subject-pill ${info.cat} ${searchClass} p-4 flex flex-col justify-center items-center text-center h-full ${isActive ? 'active-cell' : ''}`;
                         block.innerHTML = `
                             <div class="custom-tooltip">${info.name}</div>
                             <span class="text-slate-900 font-black text-2xl leading-none tracking-tighter">${code}</span>
@@ -321,8 +320,11 @@
             const hhmm = now.getHours() * 100 + now.getMinutes();
             const daysArr = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
             
-            document.getElementById('header-date').textContent = `${daysArr[day]}, ${now.getDate()} de Abril`;
-            document.getElementById('current-time-label').textContent = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+            const headerDate = document.getElementById('header-date');
+            if(headerDate) headerDate.textContent = `${daysArr[day]}, ${now.getDate()} de Abril`;
+            
+            const timeLabel = document.getElementById('current-time-label');
+            if(timeLabel) timeLabel.textContent = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
 
             let activeIdx = -1;
             let progress = 0;
@@ -355,17 +357,25 @@
                     if(nIdx < schedule.length) {
                         const next = schedule[nIdx];
                         const code = next.data[day-1];
+                        const nextName = document.getElementById('next-subject-name');
+                        const nextTime = document.getElementById('next-subject-time');
+                        const nextIcon = document.getElementById('next-subject-icon');
                         if(code && code !== "-") {
-                            document.getElementById('next-subject-name').textContent = code;
-                            document.getElementById('next-subject-time').textContent = `A las ${next.time[0]}`;
-                            document.getElementById('next-subject-icon').textContent = code.substring(0,2);
+                            if(nextName) nextName.textContent = code;
+                            if(nextTime) nextTime.textContent = `A las ${next.time[0]}`;
+                            if(nextIcon) nextIcon.textContent = code.substring(0,2);
+                        } else {
+                            if(nextName) nextName.textContent = "Fin Jornada";
                         }
                     }
                 }
             }
 
-            document.getElementById('time-left').textContent = tLeftStr;
-            document.getElementById('status-label').textContent = sLabel;
+            const timeLeftElem = document.getElementById('time-left');
+            if(timeLeftElem) timeLeftElem.textContent = tLeftStr;
+            const statusLabelElem = document.getElementById('status-label');
+            if(statusLabelElem) statusLabelElem.textContent = sLabel;
+            
             setProgress(progress);
 
             if (activeIdx !== lastActiveIdx) {
@@ -378,13 +388,18 @@
             const element = document.getElementById('pdf-grid');
             const opt = {
                 margin: 0.1,
-                filename: 'Dashboard_Horario_8A.pdf',
+                filename: 'Horario_8A_Ambar.pdf',
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
             };
             html2pdf().set(opt).from(element).save();
         }
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            render();
+        });
 
         render();
         update();
